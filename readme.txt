@@ -1,0 +1,12 @@
+Vimeo PHP OAuth Library
+Last updated: 11/24/09
+
+Changelog:
+11/24/09 - removed manifest from single-file upload
+         - added exception class
+         - use Authorization header for OAuth params by default
+         - fixed caching
+11/04/09 - default callback url to "oob"
+10/29/09 - fixed callback url bug
+10/16/09 - added callback url support to getAuthorizeUrl()
+10/15/09 - added OAuth support
