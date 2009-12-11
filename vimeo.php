@@ -87,7 +87,7 @@ class phpVimeo {
 		$base_parts = array(
 			strtoupper($request_method),
 			$url,
-			http_build_query($params)
+			urldecode(http_build_query($params))
 		);
 		$base_parts = self::url_encode_rfc3986($base_parts);
 		$base_string = implode('&', $base_parts);
