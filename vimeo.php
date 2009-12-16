@@ -315,7 +315,7 @@ class phpVimeo {
 	public function getRequestToken($callback_url = 'oob') {
 		$request_token = $this->_request(
 			null,
-			array('oauth_callback_url' => $callback_url),
+			array('oauth_callback' => $callback_url),
 			'GET',
 			self::API_REQUEST_TOKEN_URL,
 			false,

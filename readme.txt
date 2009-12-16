@@ -2,6 +2,7 @@ Vimeo PHP OAuth Library
 Last updated: 11/24/09
 
 Changelog:
+12/16/09 - fixed another callback url bug 
 12/11/09 - fixed base string url encoding issue
 11/24/09 - removed manifest from single-file upload
          - added exception class
