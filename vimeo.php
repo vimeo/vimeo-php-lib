@@ -2,10 +2,10 @@
 
 class phpVimeo {
 	
-	const API_REST_URL = 'http://vimeo.com/api/rest/v2';
-	const API_AUTH_URL = 'http://vimeo.com/oauth/authorize';
-	const API_ACCESS_TOKEN_URL = 'http://vimeo.com/oauth/access_token';
-	const API_REQUEST_TOKEN_URL = 'http://vimeo.com/oauth/request_token';
+	const API_REST_URL = 'http://www.vimeo.com/api/rest/v2';
+	const API_AUTH_URL = 'http://www.vimeo.com/oauth/authorize';
+	const API_ACCESS_TOKEN_URL = 'http://www.vimeo.com/oauth/access_token';
+	const API_REQUEST_TOKEN_URL = 'http://www.vimeo.com/oauth/request_token';
 	
 	const CACHE_FILE = 'file';
 	
@@ -82,6 +82,7 @@ class phpVimeo {
 	 */
 	private function _generateSignature($params, $request_method = 'GET', $url = self::API_REST_URL) {
 		uksort($params, 'strcmp');
+		$params = self::url_encode_rfc3986($params);
 		
 		// Make the base string
 		$base_parts = array(
