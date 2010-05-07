@@ -1,7 +1,8 @@
 Vimeo PHP OAuth Library
-Last updated: 02/04/10
+Last updated: 05/07/10
 
 Changelog:
+05/07/10 - explicitly set separator for http_build_query when building base string 
 02/04/10 - fixed parameter encoding issue
 12/16/09 - fixed another callback url bug 
 12/11/09 - fixed base string url encoding issue
