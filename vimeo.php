@@ -1,11 +1,10 @@
 <?
-
-class phpVimeo {
-	
-	const API_REST_URL = 'http://www.vimeo.com/api/rest/v2';
-	const API_AUTH_URL = 'http://www.vimeo.com/oauth/authorize';
-	const API_ACCESS_TOKEN_URL = 'http://www.vimeo.com/oauth/access_token';
-	const API_REQUEST_TOKEN_URL = 'http://www.vimeo.com/oauth/request_token';
+class phpVimeo
+{
+	const API_REST_URL = 'http://vimeo.com/api/rest/v2';
+	const API_AUTH_URL = 'http://vimeo.com/oauth/authorize';
+	const API_ACCESS_TOKEN_URL = 'http://vimeo.com/oauth/access_token';
+	const API_REQUEST_TOKEN_URL = 'http://vimeo.com/oauth/request_token';
 	
 	const CACHE_FILE = 'file';
 	
@@ -17,7 +16,8 @@ class phpVimeo {
 	private $_token_secret = false;
 	private $_upload_md5s = array();
 	
-	public function __construct($consumer_key, $consumer_secret, $token = null, $token_secret = null) {
+	public function __construct($consumer_key, $consumer_secret, $token = null, $token_secret = null)
+	{
 		$this->_consumer_key = $consumer_key;
 		$this->_consumer_secret = $consumer_secret;
 		
@@ -32,7 +32,8 @@ class phpVimeo {
 	 * @param array $params The parameters for the response.
 	 * @param string $response The serialized response data.
 	 */
-	private function _cache($params, $response) {
+	private function _cache($params, $response)
+	{
 		// Remove some unique things
 		unset($params['oauth_nonce']);
 		unset($params['oauth_signature']);
@@ -55,11 +56,14 @@ class phpVimeo {
 	 * @param array $oauth_params The OAuth parameters for the call.
 	 * @return string The OAuth Authorization header.
 	 */
-	private function _generateAuthHeader($oauth_params) {
+	private function _generateAuthHeader($oauth_params)
+	{
 		$auth_header = 'Authorization: OAuth realm=""';
+		
 		foreach ($oauth_params as $k => $v) {
 			$auth_header .= ','.self::url_encode_rfc3986($k).'="'.self::url_encode_rfc3986($v).'"';
 		}
+		
 		return $auth_header;
 	}
 	
@@ -68,7 +72,8 @@ class phpVimeo {
 	 * 
 	 * @return string The nonce
 	 */
-	private function _generateNonce() {
+	private function _generateNonce()
+	{
 		return md5(uniqid(microtime()));
 	}
 	
@@ -80,7 +85,8 @@ class phpVimeo {
 	 * @param string $url The base URL to use.
 	 * @return string The OAuth signature.
 	 */
-	private function _generateSignature($params, $request_method = 'GET', $url = self::API_REST_URL) {
+	private function _generateSignature($params, $request_method = 'GET', $url = self::API_REST_URL)
+	{
 		uksort($params, 'strcmp');
 		$params = self::url_encode_rfc3986($params);
 		
@@ -110,7 +116,8 @@ class phpVimeo {
 	 * 
 	 * @param array $params The full list of api parameters for the request.
 	 */
-	private function _getCached($params) {
+	private function _getCached($params)
+	{
 		// Remove some unique things
 		unset($params['oauth_nonce']);
 		unset($params['oauth_signature']);
@@ -137,7 +144,8 @@ class phpVimeo {
 	 * @param boolean $use_auth_header Use the OAuth Authorization header to pass the OAuth params.
 	 * @return string The response from the method call.
 	 */
-	private function _request($method, $call_params = array(), $request_method = 'GET', $url = self::API_REST_URL, $cache = true, $use_auth_header = true) {
+	private function _request($method, $call_params = array(), $request_method = 'GET', $url = self::API_REST_URL, $cache = true, $use_auth_header = true)
+	{
 		
 		// Prepare oauth arguments
 		$oauth_params = array(
@@ -228,7 +236,7 @@ class phpVimeo {
 			if ($response->stat == 'ok') {
 				return $response;
 			}
-			else if ($response->err) {
+			elseif ($response->err) {
 				throw new VimeoAPIException($response->err->msg, $response->err->code);
 			}
 			return false;
@@ -242,7 +250,8 @@ class phpVimeo {
 	 * 
 	 * @param string $perms The level of permissions to request: read, write, or delete.
 	 */
-	public function auth($permission = 'read', $callback_url = 'oob') {
+	public function auth($permission = 'read', $callback_url = 'oob')
+	{
 		$t = $this->getRequestToken($callback_url);
 		$this->setToken($t['oauth_token'], $t['oauth_token_secret'], 'request', true);
 		$url = $this->getAuthorizeUrl($this->_token, $permission);
@@ -259,7 +268,8 @@ class phpVimeo {
 	 * @param boolean $cache Whether or not to cache the response.
 	 * @return array The response from the API method
 	 */
-	public function call($method, $params = array(), $request_method = 'GET', $url = self::API_REST_URL, $cache = true) {
+	public function call($method, $params = array(), $request_method = 'GET', $url = self::API_REST_URL, $cache = true)
+	{
 		$method = (substr($method, 0, 6) != 'vimeo.') ? "vimeo.{$method}" : $method;
 		return $this->_request($method, $params, $request_method, $url, $cache);
 	}
@@ -271,7 +281,8 @@ class phpVimeo {
 	 * @param string $path The path to the cache (the directory for CACHE_FILE)
 	 * @param int $expire The amount of time to cache responses (default 10 minutes)
 	 */
-	public function enableCache($type, $path, $expire = 600) {
+	public function enableCache($type, $path, $expire = 600)
+	{
 		$this->_cache_enabled = $type;
 		if ($this->_cache_enabled == self::CACHE_FILE) {
 			$this->_cache_dir = $path;
@@ -292,7 +303,8 @@ class phpVimeo {
 	 * 
 	 * @param string $verifier The OAuth verifier returned from the authorization page or the user.
 	 */
-	public function getAccessToken($verifier) {
+	public function getAccessToken($verifier)
+	{
 		$access_token = $this->_request(null, array('oauth_verifier' => $verifier), 'GET', self::API_ACCESS_TOKEN_URL, false, true);
 		parse_str($access_token, $parsed);
 		return $parsed;
@@ -306,14 +318,16 @@ class phpVimeo {
 	 * @param string $callback_url The URL to redirect the user back to, or oob for the default.
 	 * @return string The Authorization URL.
 	 */
-	public function getAuthorizeUrl($token, $permission = 'read') {
+	public function getAuthorizeUrl($token, $permission = 'read')
+	{
 		return self::API_AUTH_URL."?oauth_token={$token}&permission={$permission}";
 	}
 	
 	/**
 	 * Get a request token.
 	 */
-	public function getRequestToken($callback_url = 'oob') {
+	public function getRequestToken($callback_url = 'oob')
+	{
 		$request_token = $this->_request(
 			null,
 			array('oauth_callback' => $callback_url),
@@ -332,7 +346,8 @@ class phpVimeo {
 	 * 
 	 * @return array An array with the token and token secret.
 	 */
-	public function getToken() {
+	public function getToken()
+	{
 		return array($this->_token, $this->_token_secret);
 	}
 	
@@ -345,7 +360,8 @@ class phpVimeo {
 	 * @param boolean $session_store Store the token in a session variable
 	 * @return boolean true
 	 */
-	public function setToken($token, $token_secret, $type = 'access', $session_store = false) {
+	public function setToken($token, $token_secret, $type = 'access', $session_store = false)
+	{
 		$this->_token = $token;
 		$this->_token_secret = $token_secret;
 		
@@ -360,86 +376,127 @@ class phpVimeo {
 	/**
 	 * Upload a video in one piece.
 	 * 
-	 * @param string $file_name The full path to the file
+	 * @param string $file_path The full path to the file
+	 * @param boolean $use_multiple_chunks Whether or not to split the file up into smaller chunks
+	 * @param string $chunk_temp_dir The directory to store the chunks in
+	 * @param int $size The size of each chunk in bytes (defaults to 2MB)
 	 * @return int The video ID
 	 */
-	public function upload($file_name) {
-		if (file_exists($file_name)) {
+	public function upload($file_path, $use_multiple_chunks = false, $chunk_temp_dir = '.', $size = 2097152)
+	{
+		if (file_exists($file_path)) {
 			
-			// MD5 the file
-			$hash = md5_file($file_name);
-
+			// Figure out the filename and full size
+			$path_parts = pathinfo($file_path);
+			$file_name = $path_parts['basename'];
+			$file_size = filesize($file_path);
+			
+			// Make sure we have enough room left in the user's quota
+			$quota = $this->call('vimeo.videos.upload.getQuota');
+			if ($quota->user->upload_space->free < $file_size) {
+				throw new VimeoAPIException('The file is larger than the user\'s remaining quota.', 707);
+			}
+			
 			// Get an upload ticket
-			$rsp = $this->call('vimeo.videos.upload.getTicket');
+			$rsp = $this->call('vimeo.videos.upload.getTicket', array(), 'GET', self::API_REST_URL, false);
 			$ticket = $rsp->ticket->id;
 			$endpoint = $rsp->ticket->endpoint;
 			
-			// Set up params for video post
-			$params = array(
-				'oauth_consumer_key'     => $this->_consumer_key,
-				'oauth_token'            => $this->_token,
-				'oauth_signature_method' => 'HMAC-SHA1',
-				'oauth_timestamp'        => time(),
-				'oauth_nonce'            => $this->_generateNonce(),
-				'oauth_version'          => '1.0',
-				'ticket_id'              => $ticket,
-			);
-			$signature = $this->_generateSignature($params, 'POST', self::API_REST_URL);
-			$params = array_merge($params, array(
-				'oauth_signature' => $signature,
-				'file_data'       => '@'.realpath($file_name) // don't include the file in the signature
-			));
-
-			// Post the video
-			$curl = curl_init($endpoint);
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($curl, CURLOPT_POST, 1);
-			curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
-			$rsp = curl_exec($curl);
-			curl_close($curl);
-
-			// If the uploaded file's MD5 doesn't match
-			if ($rsp !== $hash) {
-				throw new VimeoAPIException(799, 'Uploaded file MD5 does not match');
+			// Make sure we're allowed to upload this size file
+			if ($file_size > $rsp->ticket->max_file_size) {
+				throw new VimeoAPIException('File exceeds maximum allowed size.', 710);
 			}
 			
-			// Figure out the filename
-			$path_parts = pathinfo($file_name);
-			$base_name = $path_parts['basename'];
-			
-			// Set up parameters for confirm call
-			$params = array(
-				'oauth_consumer_key'     => $this->_consumer_key,
-				'oauth_token'            => $this->_token,
-				'oauth_signature_method' => 'HMAC-SHA1',
-				'oauth_timestamp'        => time(),
-				'oauth_nonce'            => $this->_generateNonce(),
-				'oauth_version'          => '1.0',
-				'ticket_id'              => $ticket,
-				'method'                 => 'vimeo.videos.upload.confirm',
-				'format'                 => 'php',
-				'filename'               => $base_name
-			);
-			$signature = $this->_generateSignature($params, 'POST', self::API_REST_URL);
-			$params = array_merge($params, array(
-				'oauth_signature' => $signature
-			));
+			// Split up the file if using multiple pieces
+			$chunks = array();
+			if ($use_multiple_chunks) {
+				if (!is_writeable('.')) {
+					throw new Exception('Could not write chunks. Make sure the specified folder has write access.');
+				}
+				
+				// Create pieces
+				$number_of_chunks = ceil(filesize($file_path) / $size);
+				for ($i = 0; $i < $number_of_chunks; $i++) {
+					$chunk_file_name = "{$file_name}.{$i}";
 
-			// Confirm the upload
-			$curl = curl_init(self::API_REST_URL.'?'.http_build_query($params));
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($curl, CURLOPT_POST, 1);
-			$rsp = unserialize(curl_exec($curl));
-			curl_close($curl);
+					// Break it up
+					$chunk = file_get_contents($file_path, FILE_BINARY, null, $i * $size, $size);
+					$file = file_put_contents($chunk_file_name, $chunk);
+					
+					$chunks[] = array(
+						'file' => realpath($chunk_file_name),
+						'size' => filesize($chunk_file_name)
+					);
+				}
+			}
+			else {
+				$chunks[] = array(
+					'file' => realpath($file_path),
+					'size' => filesize($file_path)
+				);
+			}
+			
+			// Upload each piece
+			foreach ($chunks as $i => $chunk) {
+				$params = array(
+					'oauth_consumer_key'     => $this->_consumer_key,
+					'oauth_token'            => $this->_token,
+					'oauth_signature_method' => 'HMAC-SHA1',
+					'oauth_timestamp'        => time(),
+					'oauth_nonce'            => $this->_generateNonce(),
+					'oauth_version'          => '1.0',
+					'ticket_id'              => $ticket,
+					'chunk_id'               => $i
+				);
+				
+				// Generate the OAuth signature
+				$params = array_merge($params, array(
+					'oauth_signature' => $this->_generateSignature($params, 'POST', self::API_REST_URL),
+					'file_data'       => '@'.$chunk['file'] // don't include the file in the signature
+				));
+				
+				// Post the file
+				$curl = curl_init($endpoint);
+				curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+				curl_setopt($curl, CURLOPT_POST, 1);
+				curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
+				$rsp = curl_exec($curl);
+				curl_close($curl);
+			}
+			
+			// Verify
+			$verify = $this->call('vimeo.videos.upload.verifyChunks', array('ticket_id' => $ticket));
+			
+			// Make sure our file sizes match up
+			foreach ($verify->ticket->chunks as $chunk_check) {
+				$chunk = $chunks[$chunk_check->id];
+				
+				if ($chunk['size'] != $chunk_check->size) {
+					// size incorrect, uh oh
+					echo "Chunk {$chunk_check->id} is actually {$chunk['size']} but uploaded as {$chunk_check->size}<br>";
+				}
+			}
+			
+			// Complete the upload
+			$complete = $this->call('vimeo.videos.upload.complete', array(
+				'filename' => $file_name,
+				'ticket_id' => $ticket
+			));
+			
+			// Clean up
+			foreach ($chunks as $chunk) {
+				unlink($chunk['file']);
+			}
 			
 			// Confirmation successful, return video id
-			if ($rsp->stat == 'ok') {
-				return $rsp->ticket->video_id;
+			if ($complete->stat == 'ok') {
+				return $complete->ticket->video_id;
 			}
-			else if ($rsp->err) {
-				throw new VimeoAPIException($rsp->err->msg, $rsp->err->code);
+			elseif ($complete->err) {
+				throw new VimeoAPIException($complete->err->msg, $complete->err->code);
 			}
 		}
+		
 		return false;
 	}
 	
@@ -450,141 +507,10 @@ class phpVimeo {
 	 * @param int $size The size of each piece in bytes (1MB default)
 	 * @return int The video ID
 	 */
-	public function uploadMulti($file_name, $size = 1048576) {
-		if (file_exists($file_name)) {
-			
-			// MD5 the whole file
-			$hash = md5_file($file_name);
-
-			// Get an upload ticket
-			$rsp = $this->call('vimeo.videos.upload.getTicket', array(), 'GET', self::API_REST_URL, false);
-			$ticket = $rsp->ticket->id;
-			$endpoint = $rsp->ticket->endpoint;
-			
-			// How many pieces?
-			$pieces = ceil(filesize($file_name) / $size);
-			
-			// Create pieces and upload
-			$chunks = array();
-			for ($i = 0; $i < $pieces; $i++) {
-				
-				$piece_file_name = "{$file_name}.{$i}";
-				
-				// Break it up
-				$piece = file_get_contents($file_name, FILE_BINARY, null, $i * $size, $size);
-				file_put_contents($piece_file_name, $piece);
-				
-				// Get the md5 for the manifest
-				$chunks[] = array('file' => $piece_file_name, 'md5' => md5_file($piece_file_name));
-				
-				// Set up params for video post
-				$params = array(
-					'oauth_consumer_key'     => $this->_consumer_key,
-					'oauth_token'            => $this->_token,
-					'oauth_signature_method' => 'HMAC-SHA1',
-					'oauth_timestamp'        => time(),
-					'oauth_nonce'            => $this->_generateNonce(),
-					'oauth_version'          => '1.0',
-					'ticket_id'              => $ticket,
-				);
-				$signature = $this->_generateSignature($params, 'POST', self::API_REST_URL);
-				$params = array_merge($params, array(
-					'oauth_signature' => $signature,
-					'file_data'       => '@'.realpath($piece_file_name)
-				));
-				
-				// Post the video
-				$curl = curl_init($endpoint);
-				curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-				curl_setopt($curl, CURLOPT_POST, 1);
-				curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
-				$rsp = curl_exec($curl);
-				curl_close($curl);
-			}
-			
-			// Create the manifest
-			$manifest = array();
-			foreach ($chunks as $file) {
-				$manifest['files'][] = array('md5' => $file['md5']);
-			}
-			$manifest = json_encode($manifest);
-			
-			// Verify the manifest
-			$params = array(
-				'oauth_consumer_key'     => $this->_consumer_key,
-				'oauth_token'            => $this->_token,
-				'oauth_signature_method' => 'HMAC-SHA1',
-				'oauth_timestamp'        => time(),
-				'oauth_nonce'            => $this->_generateNonce(),
-				'oauth_version'          => '1.0',
-				'ticket_id'              => $ticket,
-				'method'                 => 'vimeo.videos.upload.verifyManifest',
-				'format'                 => 'php'
-			);
-			
-			$signature = $this->_generateSignature($params, 'POST', self::API_REST_URL);
-			$params = array_merge($params, array(
-				'oauth_signature' => $signature
-			));
-			$curl = curl_init(self::API_REST_URL.'?'.http_build_query($params));
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($curl, CURLOPT_POST, 1);
-			curl_setopt($curl, CURLOPT_POSTFIELDS, array('json_manifest' => $manifest));
-			$rsp = unserialize(curl_exec($curl));
-			curl_close($curl);
-			
-			// Delete chunks
-			foreach ($chunks as $file) {
-				unlink($file['file']);
-			}
-			
-			// Error
-			if ($rsp->stat != 'ok') {
-				throw new VimeoAPIException($rsp->err->msg, $rsp->err->code);
-			}
-			
-			// If the uploaded file's MD5 doesn't match
-			if ($rsp->ticket->md5 !== $hash) {
-				throw new VimeoAPIException(799, 'Uploaded file MD5 does not match');
-			}
-			
-			// Figure out the filename
-			$path_parts = pathinfo($file_name);
-			$base_name = $path_parts['basename'];
-			
-			// Confirm upload
-			$params = array(
-				'oauth_consumer_key'     => $this->_consumer_key,
-				'oauth_token'            => $this->_token,
-				'oauth_signature_method' => 'HMAC-SHA1',
-				'oauth_timestamp'        => time(),
-				'oauth_nonce'            => $this->_generateNonce(),
-				'oauth_version'          => '1.0',
-				'ticket_id'              => $ticket,
-				'method'                 => 'vimeo.videos.upload.confirm',
-				'format'                 => 'php',
-				'filename'               => $base_name
-			);
-			$signature = $this->_generateSignature($params, 'POST', self::API_REST_URL);
-			$params = array_merge($params, array(
-				'oauth_signature' => $signature
-			));
-			$curl = curl_init(self::API_REST_URL.'?'.http_build_query($params));
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($curl, CURLOPT_POST, 1);
-			curl_setopt($curl, CURLOPT_POSTFIELDS, array('json_manifest' => $manifest));
-			$rsp = unserialize(curl_exec($curl));
-			curl_close($curl);
-
-			// Confirmation successful, return video id
-			if ($rsp->stat == 'ok') {
-				return $rsp->ticket->video_id;
-			}
-			else if ($rsp->err) {
-				throw new VimeoAPIException($rsp->err->msg, $rsp->err->code);
-			}
-		}
-		return false;
+	public function uploadMulti($file_name, $size = 1048576)
+	{
+		// for compatibility with old library
+		return $this->upload($file_name, true, $size);
 	}
 	
 	/**
@@ -592,7 +518,8 @@ class phpVimeo {
 	 * 
 	 * @param array/string $input A parameter or set of parameters to encode.
 	 */
-	public static function url_encode_rfc3986($input) {
+	public static function url_encode_rfc3986($input)
+	{
 		if (is_array($input)) {
 			return array_map(array('phpVimeo', 'url_encode_rfc3986'), $input);
 		}
@@ -606,8 +533,6 @@ class phpVimeo {
 	
 }
 
-class VimeoAPIException extends Exception {
-	
-}
+class VimeoAPIException extends Exception {}
 
 ?>
