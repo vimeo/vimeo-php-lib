@@ -384,133 +384,130 @@ class phpVimeo
 	 */
 	public function upload($file_path, $use_multiple_chunks = false, $chunk_temp_dir = '.', $size = 2097152)
 	{
-		if (file_exists($file_path)) {
-			
-			// Figure out the filename and full size
-			$path_parts = pathinfo($file_path);
-			$file_name = $path_parts['basename'];
-			$file_size = filesize($file_path);
-			
-			// Make sure we have enough room left in the user's quota
-			$quota = $this->call('vimeo.videos.upload.getQuota');
-			if ($quota->user->upload_space->free < $file_size) {
-				throw new VimeoAPIException('The file is larger than the user\'s remaining quota.', 707);
+		if (!file_exists($file_path)) {
+			return false;
+		}
+		
+		// Figure out the filename and full size
+		$path_parts = pathinfo($file_path);
+		$file_name = $path_parts['basename'];
+		$file_size = filesize($file_path);
+		
+		// Make sure we have enough room left in the user's quota
+		$quota = $this->call('vimeo.videos.upload.getQuota');
+		if ($quota->user->upload_space->free < $file_size) {
+			throw new VimeoAPIException('The file is larger than the user\'s remaining quota.', 707);
+		}
+		
+		// Get an upload ticket
+		$rsp = $this->call('vimeo.videos.upload.getTicket', array(), 'GET', self::API_REST_URL, false);
+		$ticket = $rsp->ticket->id;
+		$endpoint = $rsp->ticket->endpoint;
+		
+		// Make sure we're allowed to upload this size file
+		if ($file_size > $rsp->ticket->max_file_size) {
+			throw new VimeoAPIException('File exceeds maximum allowed size.', 710);
+		}
+		
+		// Split up the file if using multiple pieces
+		$chunks = array();
+		if ($use_multiple_chunks) {
+			if (!is_writeable('.')) {
+				throw new Exception('Could not write chunks. Make sure the specified folder has write access.');
 			}
 			
-			// Get an upload ticket
-			$rsp = $this->call('vimeo.videos.upload.getTicket', array(), 'GET', self::API_REST_URL, false);
-			$ticket = $rsp->ticket->id;
-			$endpoint = $rsp->ticket->endpoint;
-			
-			// Make sure we're allowed to upload this size file
-			if ($file_size > $rsp->ticket->max_file_size) {
-				throw new VimeoAPIException('File exceeds maximum allowed size.', 710);
-			}
-			
-			// Split up the file if using multiple pieces
-			$chunks = array();
-			if ($use_multiple_chunks) {
-				if (!is_writeable('.')) {
-					throw new Exception('Could not write chunks. Make sure the specified folder has write access.');
-				}
-				
-				// Create pieces
-				$number_of_chunks = ceil(filesize($file_path) / $size);
-				for ($i = 0; $i < $number_of_chunks; $i++) {
-					$chunk_file_name = "{$file_name}.{$i}";
+			// Create pieces
+			$number_of_chunks = ceil(filesize($file_path) / $size);
+			for ($i = 0; $i < $number_of_chunks; $i++) {
+				$chunk_file_name = "{$file_name}.{$i}";
 
-					// Break it up
-					$chunk = file_get_contents($file_path, FILE_BINARY, null, $i * $size, $size);
-					$file = file_put_contents($chunk_file_name, $chunk);
-					
-					$chunks[] = array(
-						'file' => realpath($chunk_file_name),
-						'size' => filesize($chunk_file_name)
-					);
-				}
-			}
-			else {
+				// Break it up
+				$chunk = file_get_contents($file_path, FILE_BINARY, null, $i * $size, $size);
+				$file = file_put_contents($chunk_file_name, $chunk);
+				
 				$chunks[] = array(
-					'file' => realpath($file_path),
-					'size' => filesize($file_path)
+					'file' => realpath($chunk_file_name),
+					'size' => filesize($chunk_file_name)
 				);
 			}
+		}
+		else {
+			$chunks[] = array(
+				'file' => realpath($file_path),
+				'size' => filesize($file_path)
+			);
+		}
+		
+		// Upload each piece
+		foreach ($chunks as $i => $chunk) {
+			$params = array(
+				'oauth_consumer_key'     => $this->_consumer_key,
+				'oauth_token'            => $this->_token,
+				'oauth_signature_method' => 'HMAC-SHA1',
+				'oauth_timestamp'        => time(),
+				'oauth_nonce'            => $this->_generateNonce(),
+				'oauth_version'          => '1.0',
+				'ticket_id'              => $ticket,
+				'chunk_id'               => $i
+			);
 			
-			// Upload each piece
-			foreach ($chunks as $i => $chunk) {
-				$params = array(
-					'oauth_consumer_key'     => $this->_consumer_key,
-					'oauth_token'            => $this->_token,
-					'oauth_signature_method' => 'HMAC-SHA1',
-					'oauth_timestamp'        => time(),
-					'oauth_nonce'            => $this->_generateNonce(),
-					'oauth_version'          => '1.0',
-					'ticket_id'              => $ticket,
-					'chunk_id'               => $i
-				);
-				
-				// Generate the OAuth signature
-				$params = array_merge($params, array(
-					'oauth_signature' => $this->_generateSignature($params, 'POST', self::API_REST_URL),
-					'file_data'       => '@'.$chunk['file'] // don't include the file in the signature
-				));
-				
-				// Post the file
-				$curl = curl_init($endpoint);
-				curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-				curl_setopt($curl, CURLOPT_POST, 1);
-				curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
-				$rsp = curl_exec($curl);
-				curl_close($curl);
-			}
-			
-			// Verify
-			$verify = $this->call('vimeo.videos.upload.verifyChunks', array('ticket_id' => $ticket));
-			
-			// Make sure our file sizes match up
-			foreach ($verify->ticket->chunks as $chunk_check) {
-				$chunk = $chunks[$chunk_check->id];
-				
-				if ($chunk['size'] != $chunk_check->size) {
-					// size incorrect, uh oh
-					echo "Chunk {$chunk_check->id} is actually {$chunk['size']} but uploaded as {$chunk_check->size}<br>";
-				}
-			}
-			
-			// Complete the upload
-			$complete = $this->call('vimeo.videos.upload.complete', array(
-				'filename' => $file_name,
-				'ticket_id' => $ticket
+			// Generate the OAuth signature
+			$params = array_merge($params, array(
+				'oauth_signature' => $this->_generateSignature($params, 'POST', self::API_REST_URL),
+				'file_data'       => '@'.$chunk['file'] // don't include the file in the signature
 			));
 			
-			// Clean up
-			foreach ($chunks as $chunk) {
-				unlink($chunk['file']);
-			}
+			// Post the file
+			$curl = curl_init($endpoint);
+			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($curl, CURLOPT_POST, 1);
+			curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
+			$rsp = curl_exec($curl);
+			curl_close($curl);
+		}
+		
+		// Verify
+		$verify = $this->call('vimeo.videos.upload.verifyChunks', array('ticket_id' => $ticket));
+		
+		// Make sure our file sizes match up
+		foreach ($verify->ticket->chunks as $chunk_check) {
+			$chunk = $chunks[$chunk_check->id];
 			
-			// Confirmation successful, return video id
-			if ($complete->stat == 'ok') {
-				return $complete->ticket->video_id;
-			}
-			elseif ($complete->err) {
-				throw new VimeoAPIException($complete->err->msg, $complete->err->code);
+			if ($chunk['size'] != $chunk_check->size) {
+				// size incorrect, uh oh
+				echo "Chunk {$chunk_check->id} is actually {$chunk['size']} but uploaded as {$chunk_check->size}<br>";
 			}
 		}
 		
-		return false;
+		// Complete the upload
+		$complete = $this->call('vimeo.videos.upload.complete', array(
+			'filename' => $file_name,
+			'ticket_id' => $ticket
+		));
+		
+		// Clean up
+		foreach ($chunks as $chunk) {
+			unlink($chunk['file']);
+		}
+		
+		// Confirmation successful, return video id
+		if ($complete->stat == 'ok') {
+			return $complete->ticket->video_id;
+		}
+		elseif ($complete->err) {
+			throw new VimeoAPIException($complete->err->msg, $complete->err->code);
+		}
 	}
 	
 	/**
 	 * Upload a video in multiple pieces.
 	 * 
-	 * @param string $file_name The full path to the file
-	 * @param int $size The size of each piece in bytes (1MB default)
-	 * @return int The video ID
+	 * @deprecated
 	 */
 	public function uploadMulti($file_name, $size = 1048576)
 	{
 		// for compatibility with old library
-		return $this->upload($file_name, true, $size);
+		return $this->upload($file_name, true, '.', $size);
 	}
 	
 	/**
