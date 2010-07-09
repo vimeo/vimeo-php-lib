@@ -2,8 +2,8 @@ h1. Vimeo Advanced API PHP Library
 
 This library is all set to go with version 2 of our API. Just create the object and call a method like this:
 
-<code>$vimeo = new phpVimeo('your consumer key', 'your consumer secret');<br>
-$videos = $vimeo->call('vimeo.videos.getUploaded', array('user_id' => 'brad'));</code>
+<pre>$vimeo = new phpVimeo('your consumer key', 'your consumer secret');
+$videos = $vimeo->call('vimeo.videos.getUploaded', array('user_id' => 'brad'));</pre>
 
 The <code>index.php</code> file included will show you how to get an access token so that you can query the API for private items. To take a look at an example of how to upload a file, check out <code>upload.php</code>.
 
