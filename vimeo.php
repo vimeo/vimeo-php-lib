@@ -419,14 +419,14 @@ class phpVimeo
         // Split up the file if using multiple pieces
         $chunks = array();
         if ($use_multiple_chunks) {
-            if (!is_writeable('.')) {
+            if (!is_writeable($chunk_temp_dir)) {
                 throw new Exception('Could not write chunks. Make sure the specified folder has write access.');
             }
 
             // Create pieces
             $number_of_chunks = ceil(filesize($file_path) / $size);
             for ($i = 0; $i < $number_of_chunks; $i++) {
-                $chunk_file_name = "{$file_name}.{$i}";
+                $chunk_file_name = "{$chunk_temp_dir}/{$file_name}.{$i}";
 
                 // Break it up
                 $chunk = file_get_contents($file_path, FILE_BINARY, null, $i * $size, $size);
