@@ -1,4 +1,4 @@
-<?
+<?php
 class phpVimeo
 {
     const API_REST_URL = 'http://vimeo.com/api/rest/v2';
@@ -540,5 +540,3 @@ class phpVimeo
 }
 
 class VimeoAPIException extends Exception {}
-
-?>
