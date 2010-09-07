@@ -94,7 +94,7 @@ class phpVimeo
         $base_parts = array(
             strtoupper($request_method),
             $url,
-            urldecode(http_build_query($params, null, '&'))
+            urldecode(http_build_query($params, '', '&'))
         );
         $base_parts = self::url_encode_rfc3986($base_parts);
         $base_string = implode('&', $base_parts);
@@ -196,7 +196,7 @@ class phpVimeo
         }
 
         if (strtoupper($request_method) == 'GET') {
-            $curl_url = $url.'?'.http_build_query($params);
+            $curl_url = $url.'?'.http_build_query($params, '', '&');
             $curl_opts = array(
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_TIMEOUT => 30
@@ -208,7 +208,7 @@ class phpVimeo
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_TIMEOUT => 30,
                 CURLOPT_POST => true,
-                CURLOPT_POSTFIELDS => http_build_query($params)
+                CURLOPT_POSTFIELDS => http_build_query($params, '', '&')
             );
         }
 
