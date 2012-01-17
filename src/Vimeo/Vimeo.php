@@ -1,5 +1,8 @@
 <?php
-class phpVimeo
+
+namespace Vimeo;
+
+class Vimeo
 {
     const API_REST_URL = 'http://vimeo.com/api/rest/v2';
     const API_AUTH_URL = 'http://vimeo.com/oauth/authorize';
