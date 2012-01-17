@@ -1,7 +1,6 @@
 <?php
-include 'vimeo.php';
 
-$vimeo = new phpVimeo('CONSUMER_KEY', 'CONSUMER_SECRET', 'ACCESS_TOKEN', 'ACCESS_TOKEN_SECRET');
+$vimeo = new \Vimeo\Vimeo('CONSUMER_KEY', 'CONSUMER_SECRET', 'ACCESS_TOKEN', 'ACCESS_TOKEN_SECRET');
 
 try {
     $video_id = $vimeo->upload('PATH_TO_VIDEO_FILE');
