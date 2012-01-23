@@ -541,5 +541,3 @@ class Vimeo
     }
 
 }
-
-class VimeoAPIException extends Exception {}
