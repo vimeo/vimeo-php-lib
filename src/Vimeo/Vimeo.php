@@ -281,7 +281,7 @@ class Vimeo
     /**
      * Enable the cache.
      *
-     * @param string $type The type of cache to use (phpVimeo::CACHE_FILE is built in)
+     * @param string $type The type of cache to use (Vimeo::CACHE_FILE is built in)
      * @param string $path The path to the cache (the directory for CACHE_FILE)
      * @param int $expire The amount of time to cache responses (default 10 minutes)
      */
@@ -530,7 +530,7 @@ class Vimeo
     public static function url_encode_rfc3986($input)
     {
         if (is_array($input)) {
-            return array_map(array('phpVimeo', 'url_encode_rfc3986'), $input);
+            return array_map(array('Vimeo', 'url_encode_rfc3986'), $input);
         }
         else if (is_scalar($input)) {
             return str_replace(array('+', '%7E'), array(' ', '~'), rawurlencode($input));
