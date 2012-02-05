@@ -239,7 +239,7 @@ class Vimeo
                 return $response;
             }
             else if ($response->err) {
-                throw new VimeoAPIException($response->err->msg, $response->err->code);
+                throw new \Vimeo\VimeoAPIException($response->err->msg, $response->err->code);
             }
 
             return false;
@@ -389,7 +389,7 @@ class Vimeo
     public function upload($file_path, $use_multiple_chunks = false, $chunk_temp_dir = '.', $size = 2097152, $replace_id = null)
     {
         if (!file_exists($file_path)) {
-            return false;
+          throw new \Exception('File does not exist.');
         }
 
         // Figure out the filename and full size
@@ -400,7 +400,7 @@ class Vimeo
         // Make sure we have enough room left in the user's quota
         $quota = $this->call('vimeo.videos.upload.getQuota');
         if ($quota->user->upload_space->free < $file_size) {
-            throw new VimeoAPIException('The file is larger than the user\'s remaining quota.', 707);
+            throw new \Vimeo\VimeoAPIException('The file is larger than the user\'s remaining quota.', 707);
         }
 
         // Get an upload ticket
@@ -416,14 +416,14 @@ class Vimeo
 
         // Make sure we're allowed to upload this size file
         if ($file_size > $rsp->ticket->max_file_size) {
-            throw new VimeoAPIException('File exceeds maximum allowed size.', 710);
+            throw new \Vimeo\VimeoAPIException('File exceeds maximum allowed size.', 710);
         }
 
         // Split up the file if using multiple pieces
         $chunks = array();
         if ($use_multiple_chunks) {
             if (!is_writeable($chunk_temp_dir)) {
-                throw new Exception('Could not write chunks. Make sure the specified folder has write access.');
+                throw new \Exception('Could not write chunks. Make sure the specified folder has write access.');
             }
 
             // Create pieces
@@ -481,12 +481,14 @@ class Vimeo
 
         // Make sure our file sizes match up
         foreach ($verify->ticket->chunks as $chunk_check) {
+          if (isset($chunks[$chunk_check->id])) {
             $chunk = $chunks[$chunk_check->id];
 
             if ($chunk['size'] != $chunk_check->size) {
                 // size incorrect, uh oh
                 echo "Chunk {$chunk_check->id} is actually {$chunk['size']} but uploaded as {$chunk_check->size}<br>";
             }
+          }
         }
 
         // Complete the upload
@@ -507,7 +509,7 @@ class Vimeo
             return $complete->ticket->video_id;
         }
         else if ($complete->err) {
-            throw new VimeoAPIException($complete->err->msg, $complete->err->code);
+            throw new \Vimeo\VimeoAPIException($complete->err->msg, $complete->err->code);
         }
     }
 
@@ -530,7 +532,7 @@ class Vimeo
     public static function url_encode_rfc3986($input)
     {
         if (is_array($input)) {
-            return array_map(array('Vimeo', 'url_encode_rfc3986'), $input);
+            return array_map(array('\Vimeo\Vimeo', 'url_encode_rfc3986'), $input);
         }
         else if (is_scalar($input)) {
             return str_replace(array('+', '%7E'), array(' ', '~'), rawurlencode($input));

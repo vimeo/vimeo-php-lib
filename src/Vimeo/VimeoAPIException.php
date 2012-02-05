@@ -1,3 +1,5 @@
 <?php
 
-class VimeoAPIException extends Exception {}
+namespace Vimeo;
+
+class VimeoAPIException extends \Exception {}
