@@ -171,7 +171,7 @@ class phpVimeo
             if (strpos($k, 'oauth_') === 0) {
                 $oauth_params[$k] = $v;
             }
-            else {
+            else if ($call_params[$k] !== null) {
                 $api_params[$k] = $v;
             }
         }
