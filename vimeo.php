@@ -493,7 +493,7 @@ class phpVimeo
         ));
 
         // Clean up
-        if (count($chunks) > 1) {
+        if ($use_multiple_chunks) {
             foreach ($chunks as $chunk) {
                 unlink($chunk['file']);
             }
