@@ -90,11 +90,13 @@ switch ($_SESSION['vimeo_state']) {
         <p><a href="<?= $authorize_link ?>"><?php echo $authorize_link ?></a></p>
     <?php endif ?>
 
-    <?php if ($ticket): ?>
-        <pre><?php print_r($ticket) ?></pre>
+    <?php if ($token): ?>
+        <p>Token:</p>
+        <pre><?php print_r($token) ?></pre>
     <?php endif ?>
 
     <?php if ($videos): ?>
+        <p>Videos:</p>
         <pre><?php print_r($videos) ?></pre>
     <?php endif ?>
 
