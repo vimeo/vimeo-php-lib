@@ -27,7 +27,6 @@ class VimeoEmbed {
 			if (file_exists($file)) {
 				unlink($file);
 			}
-			if (
 			return file_put_contents($file, serialize($response));
 		}
 	}
