@@ -11,6 +11,8 @@ $settings = array(
 );
 
 $vimeo = new VimeoEmbed;
+if($_REQUEST['clear']) $vimeo->clearCache();
+if($_REQUEST['nocache']) $vimeo->disableCache();
 $code = $vimeo->call('https://vimeo.com/35514005', $settings);
 
 ?>
