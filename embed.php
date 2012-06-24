@@ -19,7 +19,7 @@ $code = $vimeo->call('https://vimeo.com/35514005', $settings);
 <head>
 <title>TEST for Vimeo's oEmbed</title>
 <style rel="stylesheet">
-body>p {font-weight: strong;}
+body>p {font-weight: bold;}
 </style>
 </head>
 <body>
