@@ -28,6 +28,20 @@ pre {white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -o-pre-wrap
 <body>
 <h1>Testing API for Vimeo oEmbed Library</h1>
 
+<form action="embed.php" method="get" name="FoobearWinnyTheFoobear">
+<table border="0">
+<tr>
+<td><input type="checkbox" name="nocache" value="1" /></td><td>No Cache</td>
+</tr>
+<tr>
+<td><input type="checkbox" name="clear" value="1" /></td><td>Clear Cache?</td>
+</tr>
+<tr>
+<td colspan="2" style="text-align: right;"><input type="submit" value="Reload this page" /></td>
+</tr>
+</table>
+</form>
+
 <p>Parameters</p>
 <pre><?php
 
