@@ -75,7 +75,7 @@ class VimeoEmbed {
 
 		$query = http_build_query($params, 'foo_', '&', PHP_QUERY_RFC3986);
 
-		$this->_url = self::API_REST_URL . $format . '?' $query;
+		$this->_url = self::API_REST_URL . $format . '?' . $query;
 	}
 	/**
 	 * Main function of the class
