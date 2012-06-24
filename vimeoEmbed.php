@@ -140,13 +140,11 @@ class VimeoEmbed {
 	// Clear all cached files
 	public static function clearCache($cache_dir = self::_cache_dir) {
 		#if($cache_dir = '') $cache_dir = realpath(self::_cache_dir);
-		try {
-			$cache_dir = realpath($cache_dir);
-			if(!is_writeable($cache_dir) || !is_dir($cache_dir)) throw new VimeoEmbedException("No write-access to cache folder - '" . $cache_dir . "'");
-			$files = scandir($directory, 0);
-			foreach($files as $item) {
-				if(is_file($item) && preg_match('/\.cache/i', $item)) unlink($cache_dir . DIRECTORY_SEPARATOR . $item);
-			}
+		$cache_dir = realpath($cache_dir);
+		if(!is_writeable($cache_dir) || !is_dir($cache_dir)) throw new VimeoEmbedException("No write-access to cache folder - '" . $cache_dir . "'");
+		$files = scandir($directory, 0);
+		foreach($files as $item) {
+			if(is_file($item) && preg_match('/\.cache/i', $item)) unlink($cache_dir . DIRECTORY_SEPARATOR . $item);
 		}
 		//
 		#mkdir($cache_dir, 0660); // make directory with RW access for most.
