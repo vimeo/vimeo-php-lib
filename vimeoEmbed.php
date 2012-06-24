@@ -2,11 +2,10 @@
 
 class VimeoEmbed {
 	const API_REST_URL = 'http://vimeo.com/api/oembed';
-
+	const _cache_dir = './../cache';
 	const CACHE_FILE = 'file';
 
 	private $_cache_enabled = true;
-	private $_cache_dir = './../cache';
 	private $_cache_expire = 604800; // 1 week expiry
 	private $_url = false;
 
@@ -84,7 +83,7 @@ class VimeoEmbed {
 	 * @param string $url Video URL (incl. protocol)
 	 * @param array $params Additional styling parameters from oEmbed docs
 	 */
-	public function call($url = 'https://vimeo.com/7598473', $params) {
+	public function call($url = 'https://vimeo.com/7598473', $params = array()) {
 		// Merging url into parameters
 		$params['url'] = $url;
 
