@@ -141,7 +141,7 @@ class VimeoEmbed {
 		if(!is_writeable($directory) || !is_dir($directory)) return;
 		$files = scandir($directory, 0);
 		foreach($files as $item) {
-			//if($item == '.' || $item == '..') continue;
+			if($item == '.' || $item == '..') continue;
 			if(is_file($item)) unlink($directory . DIRECTORY_SEPARATOR . $item);
 			if(is_dir($item)) self::_rmdir($directory . DIRECTORY_SEPARATOR . $item);
 		}
