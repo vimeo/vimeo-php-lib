@@ -140,10 +140,12 @@ class VimeoEmbed {
 	private static function _rmdir($directory) {
 		if(!is_writeable($directory) || !is_dir($directory)) return;
 		$files = scandir($directory, 0);
-		foreach($files as $item) {
-			if($item == '.' || $item == '..') continue;
-			if(is_file($item)) unlink($directory . DIRECTORY_SEPARATOR . $item);
-			if(is_dir($item)) self::_rmdir($directory . DIRECTORY_SEPARATOR . $item);
+		if(count($files) > 2) {
+			foreach($files as $item) {
+				if($item == '.' || $item == '..') continue;
+				if(is_file($item)) unlink($directory . DIRECTORY_SEPARATOR . $item);
+				if(is_dir($item)) self::_rmdir($directory . DIRECTORY_SEPARATOR . $item);
+			}
 		}
 		rmdir($directory);
 	}
@@ -151,7 +153,7 @@ class VimeoEmbed {
 	// Clear all cached files
 	public static function clearCache($cache_dir = self::_cache_dir) {
 		#if($cache_dir = '') $cache_dir = realpath(self::_cache_dir);
-		self::_rmdir($cache_dir);
+		self::_rmdir(realpath($cache_dir));
 		mkdir($cache_dir, 0660); // make directory with RW access for most.
 	}
 }
