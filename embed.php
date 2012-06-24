@@ -23,19 +23,19 @@ $code = $vimeo->call('https://vimeo.com/35514005', $settings);
 <h1>Testing API for Vimeo oEmbed Library</h1>
 
 <p>Parameters</p>
-<div><?php
+<pre><?php
 
 $settings['url'] = 'https://vimeo.com/35514005'; // automatically merged in the library
 print_r($settings);
 
-?></div>
+?></pre>
 
 <p>Response code</p>
-<div><?php
+<pre><?php
 
 echo htmlentities(print_r($code, true));
 
-?></div>
+?></pre>
 
 <p>Raw embed code:</p>
 <pre><?php echo htmlentities($code->html); ?></pre>
