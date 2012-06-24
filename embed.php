@@ -11,7 +11,7 @@ $settings = array(
 );
 
 $vimeo = new VimeoEmbed;
-$code = $vimeo->call('https://vimeo.com/20800127', $settings);
+$code = $vimeo->call('https://vimeo.com/35514005', $settings);
 
 ?>
 <!doctype html>
@@ -25,7 +25,7 @@ $code = $vimeo->call('https://vimeo.com/20800127', $settings);
 <p>Parameters</p>
 <pre><?php
 
-$settings['url'] = 'https://vimeo.com/20800127'; // automatically merged in the library
+$settings['url'] = 'https://vimeo.com/35514005'; // automatically merged in the library
 print_r($settings);
 
 ?></pre>
