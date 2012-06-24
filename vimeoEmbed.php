@@ -2,7 +2,7 @@
 
 class VimeoEmbed {
 	const API_REST_URL = 'http://vimeo.com/api/oembed';
-	const _cache_dir = './../cache';
+	const _cache_dir = './cache';
 	const CACHE_FILE = 'file';
 
 	private $_cache_enabled = true;
