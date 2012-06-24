@@ -10,7 +10,7 @@ class VimeoEmbed {
 	private $_url = false;
 
 	public function __construct() {
-
+		if(!is_writeable(realpath(self::_cache_dir))) self::clearCache();
 	}
 
 	/**
@@ -27,6 +27,7 @@ class VimeoEmbed {
 			if (file_exists($file)) {
 				unlink($file);
 			}
+			if (
 			return file_put_contents($file, serialize($response));
 		}
 	}
