@@ -58,7 +58,7 @@ class VimeoEmbed {
 			$file = realpath(self::_cache_dir) . DIRECTORY_SEPARATOR . $hash . '.cache';
 
 			// if there is a cached file and it hasn't expired...
-			if(file_exists($file) && filemtime() + $this->_cache_expire >= time()) return true;
+			if(file_exists($file) && filemtime($file) + $this->_cache_expire >= time()) return true;
 		}
 		// if no valid cached file...
 		return false;
