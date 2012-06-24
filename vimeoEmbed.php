@@ -65,6 +65,21 @@ class VimeoEmbed {
 	}
 
 	/**
+	 * Encode URL according to latest standard
+	 */
+	public static function url_encode_rfc3986($input) {
+		if(is_array($input)) {
+			return array_map(array('VimeoEmbed', 'url_encode_rfc3986'), $input);
+		}
+		else if (is_scalar($input)) {
+			return str_replace(array('+', '%7E'), array(' ', '~'), rawurlencode($input));
+		}
+		else {
+			return '';
+		}
+	}
+
+	/**
 	 * Create the API request
 	 * 
 	 * @param array $params The API arguments
@@ -72,7 +87,7 @@ class VimeoEmbed {
 	private function _createRequest($params, $format = 'json') {
 		if(isset($params['format'])) unset($params['format']);
 
-		$query = http_build_query($params, 'foo_', '&', PHP_QUERY_RFC3986);
+		$query = http_build_query($params, '', '&');
 
 		$this->_url = self::API_REST_URL . $format . '?' . $query;
 	}
