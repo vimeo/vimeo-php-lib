@@ -10,3 +10,12 @@ The <code>index.php</code> file included will show you how to get an access toke
 h2. Support
 
 If you come across any bugs, or have any suggestions, please post them in our "API Forum":http://www.vimeo.com/forum:API.
+
+h2. oEmbed
+
+We've added an independent library for our "oEmbed API":https://developer.vimeo.com/apis/oembed. Just create the object and call a method like before:
+
+<pre>$embed = new VimeoEmbed;
+$html = $embed->call('https://vimeo.com/7598473');</pre>
+
+See <code>embed.php</code> for example usage.
