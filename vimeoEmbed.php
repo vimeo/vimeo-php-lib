@@ -144,7 +144,7 @@ class VimeoEmbed {
 		if(!is_writeable($cache_dir) || !is_dir($cache_dir)) die("No write-access to cache folder - '" . $cache_dir . "'");
 		$files = scandir($cache_dir, 0);
 		foreach($files as $item) {
-			if(is_file($item) && preg_match('/\.cache/i', $item)) unlink($cache_dir . DIRECTORY_SEPARATOR . $item);
+			if(is_file($cache_dir . DIRECTORY_SEPARATOR . $item) && preg_match('/\.cache/i', $item)) unlink($cache_dir . DIRECTORY_SEPARATOR . $item);
 		}
 		//
 		#mkdir($cache_dir, 0660); // make directory with RW access for most.
