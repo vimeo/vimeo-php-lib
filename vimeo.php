@@ -477,7 +477,7 @@ class phpVimeo
         $verify = $this->call('vimeo.videos.upload.verifyChunks', array('ticket_id' => $ticket));
 
         // Make sure our file sizes match up
-        if($use_multiple_chunks){
+        if(array_key_exists(0, $verify->ticket->chunks->chunk)){
             foreach ($verify->ticket->chunks->chunk as $chunk_check) {
                 $chunk = $chunks[$chunk_check->id];
                 if ($chunk['size'] != $chunk_check->size) {
