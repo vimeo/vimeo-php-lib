@@ -11,9 +11,10 @@
     },
 
     "autoload": {
-        "psr-0": { "Vimeo\\PhpLib": "" }
+        "psr-0": { "vimeo\\php-lib": "" }
     },
 
-    "target-dir": "Vimeo/PhpLib"
+    "target-dir": "vimeo/php-lib"
 }
+
 
