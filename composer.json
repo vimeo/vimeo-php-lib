@@ -1,0 +1,19 @@
+{
+    "name": "vimeo/php-lib",
+    "type": "generic php lib",
+    "description": "client for vimeo api",
+    "keywords": ["vimeo api rest"],
+    "homepage": "http://vimeo.com/api/docs/advanced-api",
+    "license": "",
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3.3"
+    },
+
+    "autoload": {
+        "psr-0": { "Vimeo\\PhpLib": "" }
+    },
+
+    "target-dir": "Vimeo/PhpLib"
+}
+
