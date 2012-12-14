@@ -14,7 +14,7 @@
         "psr-0": { "": "" }
     },
 
-    "target-dir": "vimeo/php-lib"
+    "target-dir": ""
 }
 
 
