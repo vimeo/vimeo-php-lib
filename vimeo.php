@@ -170,6 +170,10 @@ class phpVimeo
 
         // Merge args
         foreach ($call_params as $k => $v) {
+            if (!is_string($k)) {
+                throw new VimeoAPIException('API parameters require key names', 0);
+            }
+
             if (strpos($k, 'oauth_') === 0) {
                 $oauth_params[$k] = $v;
             }
