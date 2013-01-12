@@ -237,12 +237,16 @@ class phpVimeo
 
         // Return
         if (!empty($method)) {
+            if ($response===false) {
+               throw new VimeoAPIException('API call returned false;', 0);
+            }
+
             $response = unserialize($response);
             if ($response->stat == 'ok') {
                 return $response;
             }
             else if ($response->err) {
-                throw new VimeoAPIException($response->err->msg, $response->err->code);
+                throw new VimeoAPIException($response->err->expl, $response->err->code);
             }
 
             return false;
@@ -515,7 +519,7 @@ class phpVimeo
             return $complete->ticket->video_id;
         }
         else if ($complete->err) {
-            throw new VimeoAPIException($complete->err->msg, $complete->err->code);
+            throw new VimeoAPIException($complete->err->expl, $complete->err->code);
         }
     }
 
