@@ -177,7 +177,7 @@ class phpVimeo
             if (strpos($k, 'oauth_') === 0) {
                 $oauth_params[$k] = $v;
             }
-            else if ($call_params[$k] !== null) {
+            else if ($v !== null) {
                 $api_params[$k] = $v;
             }
         }
@@ -189,7 +189,7 @@ class phpVimeo
         $all_params = array_merge($oauth_params, $api_params);
 
         // Returned cached value
-        if ($this->_cache_enabled && ($cache && $response = $this->_getCached($all_params))) {
+        if ($this->_cache_enabled && ($cache && ($response = $this->_getCached($all_params)) !== NULL)) {
             return $response;
         }
 
@@ -242,11 +242,12 @@ class phpVimeo
             }
 
             $response = unserialize($response);
+
             if ($response->stat == 'ok') {
                 return $response;
             }
-            else if ($response->err) {
-                throw new VimeoAPIException($response->err->expl, $response->err->code);
+            else if (isset($response->err)) {
+                throw new VimeoAPIException($response->err->expl, intval($response->err->code));
             }
 
             return false;
@@ -319,6 +320,7 @@ class phpVimeo
     public function getAccessToken($verifier)
     {
         $access_token = $this->_request(null, array('oauth_verifier' => $verifier), 'GET', self::API_ACCESS_TOKEN_URL, false, true);
+        $parsed = array();
         parse_str($access_token, $parsed);
         return $parsed;
     }
@@ -352,6 +354,7 @@ class phpVimeo
             false
         );
 
+        $parsed = array();
         parse_str($request_token, $parsed);
         return $parsed;
     }
@@ -411,7 +414,7 @@ class phpVimeo
 
         // Make sure we have enough room left in the user's quota
         $quota = $this->call('vimeo.videos.upload.getQuota');
-        if ($quota->user->upload_space->free < $file_size) {
+        if (intval($quota->user->upload_space->free) < $file_size) {
             throw new VimeoAPIException('The file is larger than the user\'s remaining quota.', 707);
         }
 
@@ -427,7 +430,7 @@ class phpVimeo
         $endpoint = $rsp->ticket->endpoint;
 
         // Make sure we're allowed to upload this size file
-        if ($file_size > $rsp->ticket->max_file_size) {
+        if ($file_size > intval($rsp->ticket->max_file_size)) {
             throw new VimeoAPIException('File exceeds maximum allowed size.', 710);
         }
 
