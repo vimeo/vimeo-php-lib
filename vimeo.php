@@ -324,7 +324,6 @@ class phpVimeo
      *
      * @param string $token The request token.
      * @param string $permission The level of permissions to request: read, write, or delete.
-     * @param string $callback_url The URL to redirect the user back to, or oob for the default.
      * @return string The Authorization URL.
      */
     public function getAuthorizeUrl($token, $permission = 'read')
@@ -534,7 +533,7 @@ class phpVimeo
     /**
      * URL encode a parameter or array of parameters.
      *
-     * @param array/string $input A parameter or set of parameters to encode.
+     * @param array/string/int/boolean $input A parameter or set of parameters to encode.
      * @return array/string URL encoded version of input.
      */
     public static function url_encode_rfc3986($input)
@@ -543,6 +542,14 @@ class phpVimeo
             return array_map(array('phpVimeo', 'url_encode_rfc3986'), $input);
         }
         else if (is_scalar($input)) {
+            if (!is_string($input)) {
+                if (is_bool($input)) {
+                    $input=$input?'1':'0';
+                }	else {
+                    $input=strval($input);
+                }
+            }
+
             return str_replace(array('+', '%7E'), array(' ', '~'), rawurlencode($input));
         }
         else {
