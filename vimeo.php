@@ -232,10 +232,11 @@ class phpVimeo
         // Return
         if (!empty($method)) {
             $response = unserialize($response);
-            if ($response->stat == 'ok') {
+            
+            if ($response && $response->stat == 'ok') {
                 return $response;
             }
-            else if ($response->err) {
+            else if ($response && $response->err) {
                 throw new VimeoAPIException($response->err->msg, $response->err->code);
             }
 
