@@ -1,4 +1,8 @@
-h1. Check out the library for our new API: https://github.com/vimeo/vimeo.php
+h1. The Vimeo Advanced API has been deprecated, along with this library. 
+
+h1. Check out the new API: https://developer.vimeo.com/api
+And the new library : https://github.com/vimeo/vimeo.php 
+
 
 h1. Vimeo Advanced API PHP Library
 
