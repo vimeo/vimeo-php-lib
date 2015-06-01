@@ -17,3 +17,5 @@ The <code>index.php</code> file included will show you how to get an access toke
 h2. Support
 
 If you come across any bugs, or have any suggestions, please post them in our "API Forum":http://www.vimeo.com/forum:API.
+
+Note: php 5.6 does not work with this library. We highly recommend you update to the new library, but you can also add curl_setopt($curl, CURLOPT_SAFE_UPLOAD, true);
