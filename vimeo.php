@@ -477,12 +477,18 @@ class phpVimeo
         $verify = $this->call('vimeo.videos.upload.verifyChunks', array('ticket_id' => $ticket));
 
         // Make sure our file sizes match up
-        foreach ($verify->ticket->chunks as $chunk_check) {
-            $chunk = $chunks[$chunk_check->id];
-
-            if ($chunk['size'] != $chunk_check->size) {
+        if(array_key_exists(0, $verify->ticket->chunks->chunk)){
+            foreach ($verify->ticket->chunks->chunk as $chunk_check) {
+                $chunk = $chunks[$chunk_check->id];
+                if ($chunk['size'] != $chunk_check->size) {
                 // size incorrect, uh oh
-                echo "Chunk {$chunk_check->id} is actually {$chunk['size']} but uploaded as {$chunk_check->size}<br>";
+                   echo "Chunk {$chunk_check->id} is actually {$chunk['size']} but uploaded as {$chunk_check->size}<br>";
+                }
+            }
+        }else{
+            $chunk_check = $verify->ticket->chunks->chunk;
+            if ($chunks[0]['size'] != $chunk_check['size']){
+                   echo "Chunk {0} is actually {$chunk['size']} but uploaded as {$chunk_check['size']}<br>";
             }
         }
 
