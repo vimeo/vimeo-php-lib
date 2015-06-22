@@ -88,12 +88,13 @@ class phpVimeo
     private function _generateSignature($params, $request_method = 'GET', $url = self::API_REST_URL)
     {
         uksort($params, 'strcmp');
+	$params = self::url_encode_rfc3986($params);
 
         // Make the base string
         $base_parts = array(
             strtoupper($request_method),
             $url,
-            urldecode(http_build_query($params, '', '&', PHP_QUERY_RFC3986))
+            urldecode(http_build_query($params, '', '&'))
         );
         $base_parts = self::url_encode_rfc3986($base_parts);
         $base_string = implode('&', $base_parts);
@@ -527,6 +528,8 @@ class phpVimeo
     {
         if (is_array($input)) {
             return array_map(array('phpVimeo', 'url_encode_rfc3986'), $input);
+        } else if (is_bool($input)) {
+            return $input ? 1 : 0;
         }
         else if (is_scalar($input)) {
             return str_replace(array('+', '%7E'), array(' ', '~'), rawurlencode($input));
