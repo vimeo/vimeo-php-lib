@@ -236,7 +236,7 @@ class phpVimeo
                 return $response;
             }
             else if ($response->err) {
-                throw new VimeoAPIException($response->err->msg, $response->err->code);
+				throw new VimeoAPIException($response->err->msg, $response->err->code, new Exception($response->err->expl));
             }
 
             return false;
